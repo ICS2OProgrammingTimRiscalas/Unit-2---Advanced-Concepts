@@ -39,8 +39,6 @@ local bkg_image
 local playButton
 local creditsButton
 local instructionsButton
--- add bkg music for main_menu screen 
-
 
 -----------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
@@ -53,7 +51,7 @@ end
 
 -----------------------------------------------------------------------------------------
 
--- Creating Transition Function to Credits Page
+-- Creating Transition Function to Instructions Page
 local function InstructionsTransition( )       
     composer.gotoScene( "instructions_screen", {effect = "flipFadeOutIn", time = 500})
 end 
@@ -193,13 +191,13 @@ function scene:show( event )
     -- Called when the scene is now on screen.
     -- Insert code here to make the scene come alive.
     -- Example: start timers, begin animation, play audio, etc.
+    -- make function to call bkg music so there is no overlap between scenes 
     elseif ( phase == "did" ) then       
-    if (soundStarted == false) then
-        print("******HELLO")
-        bkgSoundChannel = audio.play(bkgSound)
-    else
-        audio.resume(bkgSoundChannel)
-    end
+        if (soundStarted == false) then
+            bkgSoundChannel = audio.play(bkgSound)
+        else
+            audio.resume(bkgSoundChannel)
+        end
 
     end
 
