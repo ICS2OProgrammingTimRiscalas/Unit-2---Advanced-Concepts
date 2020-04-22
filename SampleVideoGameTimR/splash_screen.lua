@@ -37,6 +37,7 @@ local jungleSoundsChannel
 local function moveBeetleship()
     beetleship.x = beetleship.x + scrollXSpeed
     beetleship.y = beetleship.y + scrollYSpeed
+    beetleship:rotate(8)
 end
 
 -- The function that will go to the main menu 
