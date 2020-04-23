@@ -41,10 +41,10 @@ local function moveturtle()
     turtle:rotate(8)
 end
 
--- The function that will go to the main menu 
-local function gotoMainMenu()
-    composer.gotoScene( "main_menu" )
-end
+-- Creating Transition Function to Main Menu Screen 
+local function MainMenuTransition( )       
+    composer.gotoScene( "main_menu", {effect = "zoomInOutFade", time = 500})
+end 
 
 -----------------------------------------------------------------------------------------
 -- GLOBAL SCENE FUNCTIONS
@@ -98,7 +98,7 @@ function scene:show( event )
         Runtime:addEventListener("enterFrame", moveturtle)
 
         -- Go to the main menu screen after the given time.
-        timer.performWithDelay ( 3000, gotoMainMenu)          
+        timer.performWithDelay ( 2000, MainMenuTransition)          
         
     end
 
