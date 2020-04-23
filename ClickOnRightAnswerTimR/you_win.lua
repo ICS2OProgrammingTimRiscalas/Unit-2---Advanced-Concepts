@@ -1,7 +1,7 @@
 -----------------------------------------------------------------------------------------
--- you_lose.lua
+-- you_win.lua
 -- Created by: Gil Robern
--- Modified by: Your Name
+-- Modified by: Tim R 
 -- Date: Month Day, Year
 -- Description: This shows the player that they lost the game and plays a booing sound.
 -----------------------------------------------------------------------------------------
@@ -18,7 +18,7 @@ local widget = require( "widget" )
 -----------------------------------------------------------------------------------------
 
 -- Naming Scene
-sceneName = "you_lose"
+sceneName = "you_win"
 
 -----------------------------------------------------------------------------------------
 
@@ -33,12 +33,11 @@ local scene = composer.newScene( sceneName )
 local bkg
 
 -----------------------------------------------------------------------------------------
--- SOUNDS
+-- SOUNDS 
 -----------------------------------------------------------------------------------------
 
-local youLoseSound = audio.loadSound("Sounds/monsterSound.wav")
-local youLoseSoundChannel
-
+local youWinSound = audio.loadSound("Sounds/youWinSound.wav")
+local youWinSoundChannel
 
 -----------------------------------------------------------------------------------------
 -- GLOBAL SCENE FUNCTIONS
@@ -52,7 +51,7 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- Display background
-    bkg = display.newImage("Images/You Lose.png")
+    bkg = display.newImage("Images/You Win Screen.png")
     bkg.x = display.contentCenterX
     bkg.y = display.contentCenterY
     bkg.width = display.contentWidth
@@ -68,8 +67,8 @@ end
 -- The function called when the scene is issued to appear on screen
 function scene:show( event )
 
-    -- play the you lose sound 
-    youLoseSoundChannel = audio.play(youLoseSound)
+    -- play the you win sound effect
+    youWinSoundChannel = audio.play(youWinSound)
 
     -- Creating a group that associates objects with the scene
     local sceneGroup = self.view
