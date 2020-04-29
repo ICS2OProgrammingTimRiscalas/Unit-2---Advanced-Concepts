@@ -17,7 +17,7 @@ local widget = require( "widget" )
 -----------------------------------------------------------------------------------------
 
 -- Naming Scene
-sceneName = "you_lose"
+sceneName = "you_win"
 
 -----------------------------------------------------------------------------------------
 
@@ -35,8 +35,8 @@ local bkg
 -- SOUNDS
 -----------------------------------------------------------------------------------------
 
-local youLoseSound = audio.loadSound("Sounds/YouLose.mp3")
-local youLoseSoundChannel
+local youWinSound = audio.loadSound("Sounds/you win.mp3")
+local youWinSoundChannel
 
 -----------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
@@ -50,7 +50,7 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- Display background
-    bkg = display.newImage("Images/YouLose.png")
+    bkg = display.newImage("Images/YouWin.png")
     bkg.x = display.contentCenterX
     bkg.y = display.contentCenterY
     bkg.width = display.contentWidth
@@ -72,8 +72,9 @@ function scene:show( event )
 
     -- Creating a group that associates objects with the scene
     local sceneGroup = self.view
-    -- play youLose sound effect
-    youLoseSoundChannel = audio.play(youLoseSound)
+
+    -- play you win sound effect
+    youWinSoundChannel = audio.play(youWinSound)
 
     -----------------------------------------------------------------------------------------
 
