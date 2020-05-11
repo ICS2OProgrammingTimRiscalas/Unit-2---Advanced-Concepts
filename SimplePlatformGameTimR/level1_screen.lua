@@ -83,8 +83,11 @@ local questionsAnswered = 0
 -- SOUNDS
 ----------------------------------------------------------------------------------------- 
 
-local popSound = audio.loadSound("Sounds/Pop.mp3")
-local popSoundChannel
+local dieSound = audio.loadSound("Sounds/die sound.mp3")
+local dieSoundChannel
+
+local bkgSound = audio.loadSound("Sounds/bkg music.mp3")
+local bkgSoundChannel
 
 -----------------------------------------------------------------------------------------
 -- LOCAL SCENE FUNCTIONS
@@ -182,8 +185,21 @@ local function MakeHeartsVisible()
 end
 
 local function YouLoseTransition()
-    audio.stop(popSoundChannel)
+    -- stop sound effect
+    audio.stop(dieSoundChannel)
+    -- stop bkg music
+    audio.stop(bkgSoundChannel)
+
     composer.gotoScene( "you_lose" )
+end
+
+local function YouWinTransition()
+    -- stop sound effect
+    audio.stop(dieSoundChannel)
+    -- stop bkg music
+    audio.stop(bkgSoundChannel)
+
+    composer.gotoScene( "you_win" )
 end
 
 local function onCollision( self, event )
@@ -201,7 +217,7 @@ local function onCollision( self, event )
             (event.target.myName == "spikes3") then
 
             -- add sound effect here
-            popSoundChannel = audio.play(popSound)
+            dieSoundChannel = audio.play(dieSound, {channel = 2})
 
             -- remove runtime listeners that move the character
             RemoveArrowEventListeners()
@@ -253,8 +269,8 @@ local function onCollision( self, event )
         if (event.target.myName == "door") then
             --check to see if the user has answered 5 questions
             if (questionsAnswered == 3) then
-                -- after getting 3 questions right, go to the you win screen
-                composer.gotoScene( "you_win" )
+                -- after getting 3 questions right, call the you win screen transition 
+                timer.performWithDelay(200, YouWinTransition)
             end
         end        
 
@@ -592,6 +608,9 @@ function scene:show( event )
         -- Called when the scene is now on screen.
         -- Insert code here to make the scene come alive.
         -- Example: start timers, begin animation, play audio, etc.
+
+        -- play bkg music
+        bkgSoundChannel = audio.play(bkgSound, {channel = 1, loops = -1})
 
         numLives = 3
         questionsAnswered = 0

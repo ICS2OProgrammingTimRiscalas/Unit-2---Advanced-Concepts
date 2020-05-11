@@ -74,7 +74,7 @@ function scene:show( event )
     local sceneGroup = self.view
 
     -- play you win sound effect
-    youWinSoundChannel = audio.play(youWinSound)
+    youWinSoundChannel = audio.play(youWinSound, {channel = 6})
 
     -----------------------------------------------------------------------------------------
 
