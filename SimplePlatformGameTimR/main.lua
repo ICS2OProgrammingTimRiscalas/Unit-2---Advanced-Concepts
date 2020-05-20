@@ -10,7 +10,6 @@
 display.setStatusBar( display.HiddenStatusBar )
 
 -----------------------------------------------------------------------------------------
-
 -- Use composer library
 local composer = require( "composer" )
 

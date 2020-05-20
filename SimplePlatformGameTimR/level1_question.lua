@@ -29,18 +29,6 @@ sceneName = "level1_question"
 local scene = composer.newScene( sceneName )
 
 -----------------------------------------------------------------------------------------
--- SOUNDS
------------------------------------------------------------------------------------------
-
--- make wrong sound 
-local wrongSound = audio.loadSound("Sounds/wrong sound.wav")
-local wrongSoundChannel
-
--- make correct sound
-local correctSound = audio.loadSound("Sounds/correct sound.wav")
-local correctSoundChannel
-
------------------------------------------------------------------------------------------
 -- LOCAL VARIABLES
 -----------------------------------------------------------------------------------------
 
@@ -87,53 +75,39 @@ end
 --checking to see if the user pressed the right answer and bring them back to level 1
 local function TouchListenerAnswer(touch)
     userAnswer = answerText.text
-    -- play correct sound
-    correctSoundChannel = audio.play(correctSound, {channel = 4})
-
     if (touch.phase == "ended") then
-
         BackToLevel1( )
-    
+        Playcorrect()
     end 
 end
 
 --checking to see if the user pressed the right answer and bring them back to level 1
 local function TouchListenerWrongAnswer(touch)
     userAnswer = wrongText1.text
-    -- play wrong sound 
-    wrongSoundChannel = audio.play(wrongSound, {channel = 3})
-
-    if (touch.phase == "ended") then
-        
-        BackToLevel1( )
-        
-        
-    end 
+    Incorrectsound = true
+    if (touch.phase == "ended") then 
+        BackToLevel1()
+        Playincorrect()
+    end
 end
 
 --checking to see if the user pressed the right answer and bring them back to level 1
 local function TouchListenerWrongAnswer2(touch)
     userAnswer = wrongText2.text
-    -- play wrong sound 
-    wrongSoundChannel = audio.play(wrongSound, {channel = 3})
 
     if (touch.phase == "ended") then
-
         BackToLevel1( )
-        
+        Playincorrect()
     end 
 end
 
 -- checking to see if the user pressed the right answer and bring them back to level 1
 local function TouchListenerWrongAnswer3(touch)
     userAnswer = wrongText3.text
-    -- play wrong sound 
-    wrongSoundChannel = audio.play(wrongSound, {channel = 3})
 
     if (touch.phase == "ended") then
-
         BackToLevel1( )
-        
+        Playincorrect()
     end 
 end
 
@@ -305,7 +279,6 @@ function scene:show( event )
     -----------------------------------------------------------------------------------------
 
     if ( phase == "will" ) then
-
         -- Called when the scene is still off screen (but is about to come on screen).
     -----------------------------------------------------------------------------------------
 

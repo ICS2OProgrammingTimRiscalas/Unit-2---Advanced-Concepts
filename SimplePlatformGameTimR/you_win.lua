@@ -73,8 +73,10 @@ function scene:show( event )
     -- Creating a group that associates objects with the scene
     local sceneGroup = self.view
 
-    -- play you win sound effect
-    youWinSoundChannel = audio.play(youWinSound, {channel = 6})
+    if (soundOn == true) then 
+        -- play you win sound effect
+        youWinSoundChannel = audio.play(youWinSound, {channel = 6})
+    end
 
     -----------------------------------------------------------------------------------------
 

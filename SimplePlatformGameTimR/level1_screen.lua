@@ -28,6 +28,12 @@ sceneName = "level1_screen"
 local scene = composer.newScene( sceneName )
 
 -----------------------------------------------------------------------------------------
+-- GLOBAL VARIABLES
+-----------------------------------------------------------------------------------------
+
+soundOn = true
+
+-----------------------------------------------------------------------------------------
 -- LOCAL VARIABLES
 -----------------------------------------------------------------------------------------
 
@@ -77,6 +83,9 @@ local ball3
 
 local theBall
 
+local muteButton
+local unMuteButton
+
 local questionsAnswered = 0
 
 -----------------------------------------------------------------------------------------
@@ -89,10 +98,16 @@ local dieSoundChannel
 local bkgSound = audio.loadSound("Sounds/bkg music.mp3")
 local bkgSoundChannel
 
+-- make wrong sound 
+local wrongSound = audio.loadSound("Sounds/wrong sound.wav")
+local wrongSoundChannel
+
+-- make correct sound
+local correctSound = audio.loadSound("Sounds/correct sound.wav")
+local correctSoundChannel
 -----------------------------------------------------------------------------------------
 -- LOCAL SCENE FUNCTIONS
 ----------------------------------------------------------------------------------------- 
- 
 -- When right arrow is touched, move character right
 local function right (touch)
     motionx = SPEED
@@ -140,6 +155,42 @@ end
 local function AddRuntimeListeners()
     Runtime:addEventListener("enterFrame", movePlayer)
     Runtime:addEventListener("touch", stop )
+end
+
+local function Mute (touch)
+    if (touch.phase == "ended") then 
+        -- pause the music
+        audio.pause(bkgSoundChannel)
+        -- turn the sound variable off 
+        soundOn = false
+        -- make the muteButton invisible 
+        muteButton.isVisible = true
+        --make the unmute button visible 
+        unMuteButton.isVisible = false
+    end
+end
+
+local function UnMute (touch)
+    if (touch.phase == "ended") then 
+        -- play the music
+        audio.resume(bkgSoundChannel)
+        -- turn the sound variable on
+        soundOn = true
+        -- make the muteButton invisible 
+        muteButton.isVisible = false
+        --make the unmute button visible 
+        unMuteButton.isVisible = true
+    end
+end
+
+local function AddMuteUnMuteListeners()
+    muteButton:addEventListener("touch", UnMute)
+    unMuteButton:addEventListener("touch", Mute)
+end
+
+local function RemoveMuteUnMuteListeners()
+    muteButton:removeEventListener("touch", UnMute)
+    unMuteButton:removeEventListener("touch", Mute)
 end
 
 local function RemoveRuntimeListeners()
@@ -195,9 +246,7 @@ end
 
 local function YouWinTransition()
     -- stop sound effect
-    audio.stop(dieSoundChannel)
-    -- stop bkg music
-    audio.stop(bkgSoundChannel)
+    audio.stop()
 
     composer.gotoScene( "you_win" )
 end
@@ -216,8 +265,10 @@ local function onCollision( self, event )
             (event.target.myName == "spikes2") or
             (event.target.myName == "spikes3") then
 
-            -- add sound effect here
-            dieSoundChannel = audio.play(dieSound, {channel = 2})
+            if (soundOn == true) then 
+                -- add sound effect here
+                dieSoundChannel = audio.play(dieSound, {channel = 2})
+            end
 
             -- remove runtime listeners that move the character
             RemoveArrowEventListeners()
@@ -258,10 +309,8 @@ local function onCollision( self, event )
 
             -- make the character invisible
             character.isVisible = false
-
             -- show overlay with math question
             composer.showOverlay( "level1_question", { isModal = true, effect = "fade", time = 100})
-
             -- Increment questions answered
             questionsAnswered = questionsAnswered + 1
         end
@@ -364,10 +413,9 @@ end
 -----------------------------------------------------------------------------------------
 
 function ResumeGame()
-
     -- make character visible again
     character.isVisible = true
-    
+
     if (questionsAnswered > 0) then
         if (theBall ~= nil) and (theBall.isBodyActive == true) then
             physics.removeBody(theBall)
@@ -377,6 +425,17 @@ function ResumeGame()
 
 end
 
+function Playcorrect( )
+    if (soundOn == true) then
+        Correctsound = audio.play(correctSound, {channel = 4}) 
+    end
+end
+
+function Playincorrect( )
+    if (soundOn == true) then 
+        wrongSoundChannel = audio.play(wrongSound, {channel = 3})
+    end
+end
 -----------------------------------------------------------------------------------------
 -- GLOBAL SCENE FUNCTIONS
 -----------------------------------------------------------------------------------------
@@ -580,6 +639,24 @@ function scene:create( event )
     -- Insert objects into the scene group in order to ONLY be associated with this scene
     sceneGroup:insert( ball3 )
 
+    -- mute button 
+    muteButton = display.newImageRect ("Images/muteButton.png", 70, 70)
+    muteButton.x = 50
+    muteButton.y = 730
+    muteButton.isVisible = false
+
+    -- unmute button 
+    unMuteButton = display.newImageRect ("Images/unMuteButton.png", 70, 70)
+    unMuteButton.x = 50
+    unMuteButton.y = 730
+    unMuteButton.isVisible = true
+
+    -- Insert objects into the scene group in order to ONLY be associated with this scene
+    sceneGroup:insert( muteButton )
+
+    -- Insert objects into the scene group in order to ONLY be associated with this scene
+    sceneGroup:insert( unMuteButton )
+
 end --function scene:create( event )
 
 -----------------------------------------------------------------------------------------
@@ -602,18 +679,27 @@ function scene:show( event )
 
         -- set gravity
         physics.setGravity( 0, GRAVITY )
+        if (soundOn == true) then 
+            -- play the bkg music
+            bkgSoundChannel = audio.play(bkgSound, {channel = 1, loops = -1})
+            muteButton.isVisible = false
+            unMuteButton.isVisible = true
+        else 
+            -- pause the music 
+            audio.pause(bkgSoundChannel)
+        end
 
     elseif ( phase == "did" ) then
-
+        print(soundOn)
         -- Called when the scene is now on screen.
         -- Insert code here to make the scene come alive.
         -- Example: start timers, begin animation, play audio, etc.
 
-        -- play bkg music
-        bkgSoundChannel = audio.play(bkgSound, {channel = 1, loops = -1})
+
 
         numLives = 3
         questionsAnswered = 0
+
 
         -- make all soccer balls visible
         MakeSoccerBallsVisible()
@@ -629,6 +715,9 @@ function scene:show( event )
 
         -- create the character, add physics bodies and runtime listeners
         ReplaceCharacter()
+
+        -- add the mute and unmute functionality to the buttons
+        AddMuteUnMuteListeners()
 
     end
 
@@ -660,6 +749,7 @@ function scene:hide( event )
         physics.stop()
         RemoveArrowEventListeners()
         RemoveRuntimeListeners()
+        RemoveMuteUnMuteListeners()
         display.remove(character)
     end
 

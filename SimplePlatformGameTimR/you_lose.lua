@@ -72,8 +72,11 @@ function scene:show( event )
 
     -- Creating a group that associates objects with the scene
     local sceneGroup = self.view
-    -- play youLose sound effect
-    youLoseSoundChannel = audio.play(youLoseSound, {channel = 5})
+    
+    if (soundOn == true) then 
+        -- play youLose sound effect
+        youLoseSoundChannel = audio.play(youLoseSound, {channel = 5})
+    end
 
     -----------------------------------------------------------------------------------------
 
