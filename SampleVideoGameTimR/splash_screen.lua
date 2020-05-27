@@ -1,10 +1,10 @@
 -----------------------------------------------------------------------------------------
 --
 -- splash_screen.lua
--- Created by: Your Name
+-- Created by: Tim R 
 -- Date: Month Day, Year
 -- Description: This is the splash screen of the game. It displays the 
--- company logo that...
+-- company logo that I created in photoshop.
 -----------------------------------------------------------------------------------------
 
 -- Use Composer Library
@@ -18,33 +18,129 @@ sceneName = "splash_screen"
 -- Create Scene Object
 local scene = composer.newScene( sceneName )
 
+-- hide the status bar 
+display.setStatusBar(display.HiddenStatusBar)
+
 ----------------------------------------------------------------------------------------
 -- LOCAL VARIABLES
 -----------------------------------------------------------------------------------------
+local spookySounds = audio.loadSound("Sounds/spooky sounds.ogg")
+local spookySoundsChannel
+----------------------------------------------------------------------------------------
+-- LOCAL VARIABLES 
+-----------------------------------------------------------------------------------------
  
 -- The local variables for this scene
-local turtle
+local background
+local submarine1
+local submarine2
+local completeSubmarine
+local spiderSubmarine
+local spiderWeb
 local scrollXSpeed = 8
-local scrollYSpeed = -3
-local loadingSounds = audio.loadSound("Sounds/loading sounds.mp3")
-local loadingSoundsChannel
+local scrollYSpeed = -8
+local spinCounter = 0
+local spinTimer
+local spiderTimer1
+local timer1Off = false
 
 --------------------------------------------------------------------------------------------
 -- LOCAL FUNCTIONS
 --------------------------------------------------------------------------------------------
 
--- The function that moves the turtle across the screen
-local function moveturtle()
-    turtle.x = turtle.x + scrollXSpeed
-    turtle.y = turtle.y + scrollYSpeed
-    -- rotate the turtle 
-    turtle:rotate(8)
-end
-
 -- Creating Transition Function to Main Menu Screen 
 local function MainMenuTransition( )       
     composer.gotoScene( "main_menu", {effect = "zoomInOutFade", time = 500})
 end 
+
+local function SpiderFadeIn( )
+    if (spiderSubmarine.width < 1000) then
+        completeSubmarine.alpha = completeSubmarine.alpha - 0.1
+        spiderSubmarine.alpha = spiderSubmarine.alpha + 0.1
+        completeSubmarine.width = completeSubmarine.width - 50
+        spiderSubmarine.width = spiderSubmarine.width + 50
+        completeSubmarine.height = completeSubmarine.height - 50
+        spiderSubmarine.height = spiderSubmarine.height + 25
+        spiderWeb.height = spiderWeb.height - 5
+        timer.performWithDelay(100, SpiderFadeIn)
+    else
+        timer.performWithDelay(100, MainMenuTransition)
+    end
+end
+
+local function SpiderSubmarineDown( )
+    completeSubmarine.y = completeSubmarine.y - scrollYSpeed
+    spiderWeb.y = spiderWeb.y - scrollYSpeed
+    if (timer1Off == true) then
+        timer.performWithDelay(100, SpiderSubmarineDown)
+        if (completeSubmarine.y >= display.contentHeight/2.25) then
+            timer1Off = false
+            spiderSubmarine.isVisible = true
+            spiderSubmarine.alpha = 0
+            SpiderFadeIn()
+        end
+    end
+end
+
+local function StartSpiderSubmarine( )
+    spiderWeb.isVisible = true
+    if (completeSubmarine.y >= display.contentHeight/3.5) then
+        completeSubmarine.y = completeSubmarine.y + scrollYSpeed
+        spiderWeb.y = spiderWeb.y + scrollYSpeed
+        if (timer1Off == false) then
+            spiderTimer1 = timer.performWithDelay(100, StartSpiderSubmarine)
+        end 
+    elseif (completeSubmarine.y <= display.contentHeight/2.25) then
+        timer1Off = true
+        completeSubmarine.y = completeSubmarine.y + 5
+        spiderWeb.y = spiderWeb.y + 5
+        SpiderSubmarineDown()
+    end
+end
+
+
+
+local function MoveCompleteSubmarine( )
+    completeSubmarine:rotate(scrollYSpeed)
+    if (spinCounter == 39) then
+        timer.cancel(spinTimer)
+        timer.performWithDelay(400, StartSpiderSubmarine)
+    else
+        spinCounter = spinCounter + 1
+        spinTimer = timer.performWithDelay(85, MoveCompleteSubmarine)
+    end
+end
+-- The function that moves the submarine1 across the screen
+local function MoveSubmarine1()
+    submarine1.x = submarine1.x + scrollXSpeed
+    submarine1.y = submarine1.y + scrollYSpeed
+    -- move the submarine1 towards the centre where it connects to submarine2 
+    if (((submarine1.x - completeSubmarine.width/3.7) < completeSubmarine.x ) and 
+        ((submarine1.x + completeSubmarine.width/3.7) > completeSubmarine.x ) and 
+        ((submarine1.y - completeSubmarine.height/3.7) < completeSubmarine.y ) and 
+        ((submarine1.y + completeSubmarine.height/3.7) > completeSubmarine.y ) ) then
+        submarine1.isVisible = false
+        completeSubmarine.isVisible = true
+    end
+end
+
+
+-- The function that moves the submarine2 across the screen
+local function MoveSubmarine2()
+    submarine2.x = submarine2.x - scrollXSpeed
+    submarine2.y = submarine2.y + scrollYSpeed
+    -- moves the submarine2 towards the centre where it connects to submarine1
+    if (((submarine2.x - completeSubmarine.width/3.7) < completeSubmarine.x ) and 
+        ((submarine2.x + completeSubmarine.width/3.7) > completeSubmarine.x ) and 
+        ((submarine2.y - completeSubmarine.height/3.7) < completeSubmarine.y ) and 
+        ((submarine2.y + completeSubmarine.height/3.7) > completeSubmarine.y ) ) then
+        submarine2.isVisible = false
+        MoveCompleteSubmarine()
+    end
+end
+
+
+
 
 -----------------------------------------------------------------------------------------
 -- GLOBAL SCENE FUNCTIONS
@@ -56,18 +152,56 @@ function scene:create( event )
     -- Creating a group that associates objects with the scene
     local sceneGroup = self.view
 
-    -- set the background to be black
-    display.setDefault("background", 0, 0, 0)
+    -- display the background image 
+    background = display.newImageRect("CompanyLogoImages/background.png", display.contentWidth, display.contentHeight)
+    -- anchor the background's position
+    background.anchorX = 0
+    background.anchorY = 0
 
-    -- Insert the turtle image
-    turtle = display.newImageRect("Images/turtle.png", 200, 200)
+    -- Insert the submarine1 image
+    submarine1 = display.newImageRect("CompanyLogoImages/Submarine 1.png", 200, 200)
+    -- set the initial x and y position of the submarine1
+    submarine1.x = 0
+    submarine1.y = display.contentHeight
 
-    -- set the initial x and y position of the turtle
-    turtle.x = 100
-    turtle.y = display.contentHeight/2
+    -- Insert the submarine2 image
+    submarine2 = display.newImageRect("CompanyLogoImages/Submarine 2.png", 200, 200)
+    -- set the initial x and y position of the submarine1
+    submarine2.x = display.contentWidth
+    submarine2.y = display.contentHeight
+
+    -- Insert the completeSubmarine image 
+    completeSubmarine = display.newImageRect("CompanyLogoImages/Complete submarine.png", 300, 200)
+    -- set the initial x and y position of the completeSubmarine
+    completeSubmarine.x = display.contentWidth/2
+    completeSubmarine.y = display.contentHeight/2.25
+    -- make the completeSubmarine invisible
+    completeSubmarine.isVisible = false
+
+    -- create the spiderWeb
+    spiderWeb = display.newRect(display.contentWidth/2, 0, 5, display.contentHeight/1.5)
+    -- make the spiderWeb invisible
+    spiderWeb.isVisible = false
+
+    -- display the spiderSubmarine 
+    spiderSubmarine = display.newImageRect("CompanyLogoImages/Spider submarine.png", 500, 200)
+    -- set the initial x and y position of the spiderSubmarine
+    spiderSubmarine.x = display.contentWidth/2.08
+    spiderSubmarine.y = display.contentHeight/2.59
+    -- make the spiderSubmarine invisible
+    spiderSubmarine.isVisible = false
 
     -- Insert objects into the scene group in order to ONLY be associated with this scene
-    sceneGroup:insert( turtle )
+    sceneGroup:insert(background)
+
+    sceneGroup:insert( submarine1 )
+
+    sceneGroup:insert( submarine2 )
+    
+    sceneGroup:insert( spiderWeb )
+    
+    sceneGroup:insert( spiderSubmarine )
+
 
 end -- function scene:create( event )
 
@@ -92,13 +226,13 @@ function scene:show( event )
 
     elseif ( phase == "did" ) then
         -- start the splash screen music
-        loadingSoundsChannel = audio.play(loadingSounds )
+        spookySoundsChannel = audio.play(spookySounds )
 
-        -- Call the moveturtle function as soon as we enter the frame.
-        Runtime:addEventListener("enterFrame", moveturtle)
+        -- Call the movesubmarine1 function as soon as we enter the frame.
+        Runtime:addEventListener("enterFrame", MoveSubmarine1)
 
-        -- Go to the main menu screen after the given time.
-        timer.performWithDelay ( 2000, MainMenuTransition)          
+        -- Call the movesubmarine function as soon as we enter the frame.
+        Runtime:addEventListener("enterFrame", MoveSubmarine2)      
         
     end
 
@@ -126,7 +260,7 @@ function scene:hide( event )
     elseif ( phase == "did" ) then
         
         -- stop the jungle sounds channel for this screen
-        audio.stop(loadingSoundsChannel)
+        audio.stop(spookySoundsChannel)
     end
 
 end --function scene:hide( event )
