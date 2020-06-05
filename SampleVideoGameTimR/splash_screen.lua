@@ -22,10 +22,12 @@ local scene = composer.newScene( sceneName )
 display.setStatusBar(display.HiddenStatusBar)
 
 ----------------------------------------------------------------------------------------
--- LOCAL VARIABLES
+-- LOCAL SOUNDS 
 -----------------------------------------------------------------------------------------
+
 local spookySounds = audio.loadSound("Sounds/spooky sounds.ogg")
 local spookySoundsChannel
+
 ----------------------------------------------------------------------------------------
 -- LOCAL VARIABLES 
 -----------------------------------------------------------------------------------------
@@ -82,13 +84,13 @@ local function SpiderSubmarineDown( )
     end
 end
 
-local function StartSpiderSubmarine( )
+local function StartSpiderWebSubmarine( )
     spiderWeb.isVisible = true
     if (completeSubmarine.y >= display.contentHeight/3.5) then
         completeSubmarine.y = completeSubmarine.y + scrollYSpeed
         spiderWeb.y = spiderWeb.y + scrollYSpeed
         if (timer1Off == false) then
-            spiderTimer1 = timer.performWithDelay(100, StartSpiderSubmarine)
+            spiderTimer1 = timer.performWithDelay(100, StartSpiderWebSubmarine)
         end 
     elseif (completeSubmarine.y <= display.contentHeight/2.25) then
         timer1Off = true
@@ -98,18 +100,17 @@ local function StartSpiderSubmarine( )
     end
 end
 
-
-
-local function MoveCompleteSubmarine( )
+local function RotateCompleteSubmarine( )
     completeSubmarine:rotate(scrollYSpeed)
     if (spinCounter == 39) then
         timer.cancel(spinTimer)
-        timer.performWithDelay(400, StartSpiderSubmarine)
+        timer.performWithDelay(400, StartSpiderWebSubmarine)
     else
         spinCounter = spinCounter + 1
-        spinTimer = timer.performWithDelay(85, MoveCompleteSubmarine)
+        spinTimer = timer.performWithDelay(85, RotateCompleteSubmarine)
     end
 end
+
 -- The function that moves the submarine1 across the screen
 local function MoveSubmarine1()
     submarine1.x = submarine1.x + scrollXSpeed
@@ -124,7 +125,6 @@ local function MoveSubmarine1()
     end
 end
 
-
 -- The function that moves the submarine2 across the screen
 local function MoveSubmarine2()
     submarine2.x = submarine2.x - scrollXSpeed
@@ -135,12 +135,9 @@ local function MoveSubmarine2()
         ((submarine2.y - completeSubmarine.height/3.7) < completeSubmarine.y ) and 
         ((submarine2.y + completeSubmarine.height/3.7) > completeSubmarine.y ) ) then
         submarine2.isVisible = false
-        MoveCompleteSubmarine()
+        RotateCompleteSubmarine()
     end
 end
-
-
-
 
 -----------------------------------------------------------------------------------------
 -- GLOBAL SCENE FUNCTIONS
@@ -259,7 +256,7 @@ function scene:hide( event )
     -- Called immediately after scene goes off screen.
     elseif ( phase == "did" ) then
         
-        -- stop the jungle sounds channel for this screen
+        -- stop the spooky sounds channel for this screen
         audio.stop(spookySoundsChannel)
     end
 
